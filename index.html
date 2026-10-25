@@ -124,19 +124,23 @@
   .hidden{ display:none !important; }
 
   /* ---------- Touch controls ---------- */
-  #touch{ position:absolute; inset:0; z-index:3; pointer-events:none; display:none; }
-  @media (pointer:coarse){ #touch{ display:block; } }
-  .tbtn{
-    position:absolute; bottom:12px; width:64px; height:64px; border-radius:50%;
-    background:rgba(255,255,255,.16); border:3px solid rgba(255,255,255,.45);
-    color:#fff; font-size:22px; pointer-events:auto; user-select:none; -webkit-user-select:none;
-    touch-action:none; display:flex; align-items:center; justify-content:center; font-family:inherit;
+  #touch{
+    display:none; width:min(1024px,96vw);
+    align-items:center; justify-content:space-between; padding:4px 6px;
   }
-  #tLeft{ left:14px; } #tRight{ left:92px; } #tJump{ right:14px; width:86px; height:86px; border-radius:24px; }
+  @media (pointer:coarse){ #touch{ display:flex; } }
+  .dpad{ display:flex; gap:14px; }
+  .tbtn{
+    width:84px; height:84px; border-radius:50%;
+    background:rgba(255,255,255,.16); border:3px solid rgba(255,255,255,.45);
+    color:#fff; font-size:24px; user-select:none; -webkit-user-select:none;
+    touch-action:none; display:flex; align-items:center; justify-content:center;
+    font-family:inherit;
+  }
+  #tJump{ width:120px; height:84px; border-radius:24px; font-size:14px; }
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="brand">TINY HEROES<span>THE GREAT ESCAPE · FINAL</span></div>
   <div class="tools">
@@ -184,10 +188,11 @@
   </div>
 
   <div id="touch">
+  <div class="dpad">
     <div class="tbtn" id="tLeft">◀</div>
     <div class="tbtn" id="tRight">▶</div>
-    <div class="tbtn" id="tJump">JUMP</div>
   </div>
+  <div class="tbtn" id="tJump">JUMP</div>
 </div>
 
 <div id="credit">STOMP · COLLECT · POWER UP · BEAT THE MAGMA KING · 5 LEVELS AWAIT · PRESS R TO RESTART</div>
