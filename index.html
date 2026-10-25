@@ -1429,6 +1429,112 @@ function loop(now){
 }
 requestAnimationFrame(loop);
 if(document.fonts && document.fonts.load){ try{ document.fonts.load('12px "Press Start 2P"'); }catch(e){} }
+/* TINY HEROES — NEW SHOP HEROES ADD-ON (11 characters)
+   Load AFTER the main game script (see instructions). Uses the game's own SAVE / SKINS / CHARS / SPR. */
+(function(){
+let buildCards;
+const NEW=['dragon','unicorn','ninja','knight','fox','panda','alien','pirate','phoenix','shark','wizard'];
+const DEF={
+dragon:{label:'DRAGON',emoji:'🐉',price:500,color:'#4cd964',ability:'Fire Glide!<br>hold JUMP to hover',speed:290,jump:780,float:true,
+ pal:{g:'#4cd964',d:'#2a8a3c',y:'#ffe98a',W:'#fff',B:'#1d1633',f:'#ff8c3b'},
+ rows:['.f........f.','.gg......gg.','.gggggggggg.','gggggggggggg','ggWBggggWBgg','ggWBggggWBgg','gggggggggggg','gggdggggdggg','.gggyyyyggg.','.gdyyyyyydg.','.gg.gggg.gg.','.dd......dd.']},
+unicorn:{label:'UNICORN',emoji:'🦄',price:300,color:'#ff7ad9',ability:'Rainbow Hop!<br>double jump + quick',speed:300,jump:770,djump:680,
+ pal:{w:'#fff',m:'#ff7ad9',c:'#9ad8ff',h:'#ffd93d',B:'#3a2a5e',p:'#ffb3c1',d:'#c9b8e8'},
+ rows:['.....h......','.....h......','..wwwwwwww..','.wwwwwwwwww.','mwwBwwwwBwwm','mwwBwwwwBwwm','cwwwwwwwwwwc','cwpwwwwwwpwc','mwwwwwwwwwwm','.wwwwwwwwww.','.ww.wwww.ww.','.dd......dd.']},
+ninja:{label:'NINJA',emoji:'🥷',price:200,color:'#e33b3b',ability:'Shadow Dash!<br>fast + double jump',speed:360,jump:760,djump:640,
+ pal:{k:'#2a2d4a',s:'#ffd9b0',r:'#e33b3b',W:'#fff',B:'#141428'},
+ rows:['............','...kkkkkk...','..kkkkkkkk..','rrrrrrrrrrrr','.kssssssssk.','.ksWBssWBsk.','.kssssssssk.','..kkkkkkkk..','.kkkkkkkkkk.','.kk.kkkk.kk.','.kk......kk.','.kk......kk.']},
+knight:{label:'KNIGHT',emoji:'🛡️',price:250,color:'#aeb9c9',ability:'Iron Armor!<br>start each level shielded',speed:240,jump:760,startShield:true,
+ pal:{h:'#aeb9c9',d:'#7d8ba0',v:'#2a2f3d',r:'#ff4d4d',y:'#ffd93d',W:'#fff',B:'#1d1633'},
+ rows:['.....rr.....','....rrrr....','..hhhhhhhh..','.hhhhhhhhhh.','.hvvvvvvvvh.','.hvWBvvWBvh.','.hhhhhhhhhh.','.hhhhyyhhhh.','hhhhhhhhhhhh','hdhhhhhhhhdh','.hh.hhhh.hh.','.dd......dd.']},
+fox:{label:'FOX',emoji:'🦊',price:150,color:'#ff8a3b',ability:'Sly Sprint!<br>very fast + good jump',speed:410,jump:780,
+ pal:{o:'#ff8a3b',w:'#fff',d:'#c4561a',B:'#1d1633',n:'#1d1633',W:'#fff'},
+ rows:['.o........o.','.oo......oo.','.oooooooooo.','oooooooooooo','ooWBooooWBoo','ooWBooooWBoo','owwwoooowwwo','wwwwwnnwwwww','.wwwwwwwwww.','.oooooooooo.','.oo.oooo.oo.','.dd......dd.']},
+panda:{label:'PANDA',emoji:'🐼',price:150,color:'#d9d9d9',ability:'Bouncy Bear!<br>jumps super high',speed:235,jump:840,
+ pal:{w:'#fff',k:'#2a2a2a',W:'#fff'},
+ rows:['kk........kk','kkk......kkk','.wwwwwwwwww.','wwwwwwwwwwww','wkkkwwwwkkkw','wkWkwwwwkWkw','wwwwwkkwwwww','wwwwwwwwwwww','.wwwwwwwwww.','kkwwwwwwwwkk','.kk.wwww.kk.','.kk......kk.']},
+alien:{label:'ALIEN',emoji:'👽',price:350,color:'#7ee081',ability:'UFO Hover!<br>mega jump + hover',speed:280,jump:900,float:true,
+ pal:{g:'#7ee081',d:'#3fa653',B:'#1d1633',a:'#ff6bd6'},
+ rows:['.a........a.','.g........g.','..gggggggg..','.gggggggggg.','gggggggggggg','gBBBggggBBBg','gBBBggggBBBg','gggggggggggg','.ggggddgggg.','..gggggggg..','..gg.gg.gg..','..dd....dd..']},
+pirate:{label:'PIRATE',emoji:'🏴‍☠️',price:300,color:'#d94f2e',ability:'Treasure Hunter!<br>every coin counts double',speed:300,jump:780,bonus:1,
+ pal:{h:'#2a2a3a',W:'#fff',s:'#ffd9b0',B:'#1d1633',b:'#5b3a1e',r:'#d94f2e'},
+ rows:['..hhhhhhhh..','.hhhhWWhhhh.','hhhhhhhhhhhh','.ssssssssss.','.sBBsssWBss.','.sBBsssWBss.','.ssssssssss.','.sbbbbbbbbs.','..bbbbbbbb..','.rrrrrrrrrr.','.rr.rrrr.rr.','.bb......bb.']},
+phoenix:{label:'PHOENIX',emoji:'🔥',price:600,color:'#ff6b2e',ability:'Rebirth Flight!<br>double jump + hover',speed:300,jump:780,djump:700,float:true,
+ pal:{o:'#ff6b2e',y:'#ffd93d',r:'#ff3b3b',B:'#1d1633',W:'#fff',k:'#ffb300'},
+ rows:['....r.y.r...','...rrrrrr...','..oooooooo..','.oooooooooo.','.ooWBooWBoo.','.ooWBooWBoo.','.ooookkoooo.','yooooooooooy','yyooyyyyooyy','.yyooyyooyy.','..yy.rr.yy..','..rr....rr..']},
+shark:{label:'SHARK',emoji:'🦈',price:250,color:'#6f8fb0',ability:'Torpedo!<br>speedy swimmer',speed:380,jump:740,
+ pal:{g:'#6f8fb0',d:'#44607f',f:'#44607f',w:'#e8f0f8',W:'#fff',B:'#1d1633'},
+ rows:['.....ff.....','....ffff....','..gggggggg..','.gggggggggg.','.ggWBggWBgg.','.ggWBggWBgg.','gggggggggggg','gggggggggggg','gwwwwwwwwwwg','gwWwWwWwWwWg','.wwwwwwwwww.','.dd.dddd.dd.']},
+wizard:{label:'WIZARD',emoji:'🧙',price:400,color:'#8a5cf0',ability:'Coin Magic!<br>magnet at level start',speed:280,jump:780,startMagnet:6,
+ pal:{h:'#6a3fd6',s:'#ffd93d',k:'#ffd9b0',B:'#1d1633',W:'#f2f2ff'},
+ rows:['.....hh.....','....hhhh....','...hhhhhh...','..hhhsshhh..','.hhhhhhhhhh.','hhhhhhhhhhhh','..kBkkkkBk..','..kkkkkkkk..','.WWWWWWWWWW.','.WWWWWWWWWW.','..hhhhhhhh..','..hh....hh..']}
+};
+for(const k of NEW){ const d=DEF[k]; SPR[k]=d.rows; SKINS[k]=[{id:'classic',name:'Classic',price:0,pal:d.pal}];
+  CHARS[k]=Object.assign({},d,{sprite:d.rows}); }
+
+/* saved heroes (main script's loadSave doesn't know about them) */
+SAVE.heroes=[]; SAVE.hero=null;
+try{ const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+  if(s){ if(Array.isArray(s.heroes)) SAVE.heroes=s.heroes.filter(k=>NEW.includes(k));
+         if(typeof s.hero==='string' && CHARS[s.hero] && (ORDER.includes(s.hero)||SAVE.heroes.includes(s.hero))) SAVE.hero=s.hero; } }catch(e){}
+
+const ownedList=()=>ORDER.concat(NEW.filter(k=>SAVE.heroes.includes(k)));
+
+/* menu cards: originals + any hero you bought */
+function drawCard(key){ const g=cardCtx[key]; if(!g) return; g.clearRect(0,0,112,112);
+  g.globalAlpha=key==='ghost'?0.9:1; drawSprite(g,CHARS[key].sprite,charPal(key).pal,8,8,8); g.globalAlpha=1; }
+buildCards=function(){
+  cardsEl.innerHTML=''; for(const k in cardCtx) delete cardCtx[k];
+  ownedList().forEach((key,i)=>{
+    const c=CHARS[key], b=document.createElement('button'); b.className='card'; b.style.setProperty('--cc',c.color);
+    if(SAVE.hero===key) b.style.boxShadow='0 0 0 4px #ffd93d,0 6px 0 rgba(0,0,0,.35)';
+    const pv=document.createElement('canvas'); pv.width=pv.height=112; cardCtx[key]=pv.getContext('2d'); b.appendChild(pv);
+    b.insertAdjacentHTML('beforeend',`<div class="cname">${c.emoji} ${c.label}</div><div class="cabil">${c.ability}</div><div class="ckey">${i<4?'[ press '+(i+1)+' ]':'&nbsp;'}</div>`);
+    b.onclick=()=>pick(key); cardsEl.appendChild(b); drawCard(key);
+  });
+};
+redrawCard=function(key){ drawCard(key); };
+pick=function(key){ SAVE.hero=key; saveSave(); SFX.select(); startGame(key); };
+
+/* abilities that the main engine doesn't have built in */
+const _ll=loadLevel;
+loadLevel=function(i){ _ll(i); const c=CHARS[G.charKey]; if(c.startShield) shield=true; if(c.startMagnet) magnetT=c.startMagnet; };
+const _up=updatePlay;
+updatePlay=function(dt){ const b0=SAVE.bank; _up(dt); const gain=SAVE.bank-b0, bn=CHARS[G.charKey].bonus||0;
+  if(gain>0 && bn){ SAVE.bank+=gain*bn; updBank(); saveSave(); } };
+
+/* shop: extra "NEW HEROES" tab */
+function renderHeroes(){
+  const gridEl=document.getElementById('shopGrid'); gridEl.innerHTML='';
+  NEW.forEach(key=>{
+    const ch=CHARS[key], owned=SAVE.heroes.includes(key), eq=SAVE.hero===key;
+    const card=document.createElement('div'); card.className='skin'+(eq?' eq':'');
+    const c=document.createElement('canvas'); c.width=96; c.height=86;
+    const g=c.getContext('2d'); g.imageSmoothingEnabled=false; drawSprite(g,ch.sprite,ch.pal,12,7,6); card.appendChild(c);
+    card.insertAdjacentHTML('beforeend',`<div class="sname">${ch.emoji} ${ch.label}</div><div class="sprice">${owned?'OWNED':ch.price+' 🪙'}</div><div class="sprice" style="color:#bde3ff;font-size:7px;line-height:1.6;text-align:center">${ch.ability}</div>`);
+    const btn=document.createElement('button'); btn.type='button'; btn.className='px sbuy';
+    const equip=()=>{ SAVE.hero=key; if(storePrev==='play') G.charKey=key; saveSave(); buildCards(); renderShop(); };
+    if(eq){ btn.textContent='EQUIPPED ✓'; btn.disabled=true; }
+    else if(owned){ btn.textContent='EQUIP'; btn.onclick=()=>{ SFX.equip(); equip(); }; }
+    else { btn.textContent='BUY '+ch.price+' 🪙'; if(SAVE.bank<ch.price) btn.disabled=true;
+      btn.onclick=()=>{ if(SAVE.bank<ch.price){ SFX.deny(); card.classList.add('deny'); setTimeout(()=>card.classList.remove('deny'),420); return; }
+        SAVE.bank-=ch.price; SAVE.heroes.push(key); SFX.buy(); updBank(); equip(); }; }
+    card.appendChild(btn); gridEl.appendChild(card);
+  });
+}
+const _rs=renderShop;
+renderShop=function(){
+  if(NEW.includes(shopChar)) shopChar='__heroes';
+  const hero=shopChar==='__heroes'; if(hero) shopChar='slime';
+  _rs(); if(hero) shopChar='__heroes';
+  const tabs=document.getElementById('shopTabs');
+  if(hero) tabs.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));
+  const hb=document.createElement('button'); hb.type='button'; hb.className='stab'+(hero?' on':''); hb.textContent='★ NEW HEROES';
+  hb.onclick=()=>{ SFX.select(); shopChar='__heroes'; renderShop(); }; tabs.appendChild(hb);
+  if(hero) renderHeroes();
+};
+buildCards();
+})();
 </script>
 </body>
 </html>
