@@ -3,145 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<title>Tiny Heroes: The Great Escape — Final</title>
+<title>Tiny Heroes: The Great Escape</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  *{ box-sizing:border-box; margin:0; padding:0; }
-  html,body{ min-height:100%; }
-  body{
-    background:linear-gradient(160deg,#1b1240 0%,#31246b 45%,#173d6b 100%);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    font-family:'Press Start 2P',monospace; color:#fff; padding:14px; gap:12px;
-  }
-  /* ---------- top toolbar ---------- */
-  .topbar{ width:min(1024px,96vw); display:flex; align-items:center; justify-content:space-between; gap:10px 14px; flex-wrap:wrap; }
-  .brand{ font-size:13px; color:#ffd93d; text-shadow:0 3px 0 rgba(0,0,0,.45); letter-spacing:1px; line-height:1.7; }
-  .brand span{ display:block; font-size:8px; color:#b388ff; letter-spacing:2px; }
-  .tools{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .bankchip{ font-size:10px; color:#ffd93d; background:#241b4d; border:3px solid #ffd93d; border-radius:10px; padding:9px 12px; box-shadow:0 4px 0 rgba(0,0,0,.35); }
-  .bankchip b{ color:#ffe98a; }
-  button.px{
-    font-family:inherit; font-size:11px; color:#1d1633; background:#ffd93d; border:0;
-    border-radius:10px; padding:12px 18px; cursor:pointer; box-shadow:0 5px 0 #b3541e;
-    transition:transform .08s;
-  }
-  button.px:hover{ transform:translateY(-2px); }
-  button.px:active{ transform:translateY(2px); box-shadow:0 2px 0 #b3541e; }
-  button.px.small{ font-size:9px; padding:9px 12px; box-shadow:0 4px 0 #b3541e; border-radius:8px; }
-  button.px.small:active{ box-shadow:0 1px 0 #b3541e; }
-  button.px.alt{ background:#b388ff; box-shadow:0 5px 0 #5e3a99; }
-  button.px.gold{ background:#ff9d3b; box-shadow:0 4px 0 #a85a10; }
-  button.px.gold:active{ box-shadow:0 1px 0 #a85a10; }
-  button.px:disabled{ opacity:.5; cursor:default; transform:none; }
-  .btnrow{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-  #wrap{ position:relative; width:min(1024px,96vw); }
-  canvas#game{
-    display:block; width:100%; height:auto; background:#000;
-    border:6px solid #14102b; border-radius:14px;
-    box-shadow:0 16px 40px rgba(0,0,0,.55); image-rendering:pixelated;
-  }
-  #credit{ font-size:8px; color:#8f86c9; letter-spacing:1px; text-align:center; line-height:1.8; }
-
-  /* ---------- Character select menu ---------- */
-  #menu{
-    position:absolute; inset:6px; z-index:5; border-radius:10px;
-    background:rgba(22,14,46,.66); backdrop-filter:blur(4px);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:16px; text-align:center; padding:14px; overflow-y:auto;
-  }
-  #menu h1{ font-size:clamp(18px,3.4vw,32px); color:#ffd93d;
-    text-shadow:0 4px 0 #b3541e,0 8px 0 rgba(0,0,0,.35); letter-spacing:2px; }
-  #menu .sub{ font-size:clamp(8px,1.3vw,12px); color:#bde3ff; margin-top:6px; }
-  #cards{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
-  .card{
-    --cc:#5ad946; background:#241b4d; border:4px solid var(--cc); border-radius:12px;
-    padding:8px 8px 10px; cursor:pointer; color:#fff; font-family:inherit; width:128px;
-    display:flex; flex-direction:column; align-items:center; gap:6px;
-    box-shadow:0 6px 0 rgba(0,0,0,.35); transition:transform .12s, background .12s;
-  }
-  .card:hover{ transform:translateY(-6px) scale(1.05); background:#332566; }
-  .card canvas{ image-rendering:pixelated; border-radius:8px; }
-  .cname{ font-size:11px; } .cabil{ font-size:7px; color:var(--cc); line-height:1.6; min-height:22px; }
-  .ckey{ font-size:7px; color:#8f86c9; }
-  .hint{ font-size:8px; color:#cfd0ff; line-height:1.9; }
-
-  /* ---------- Overlay panels (clear / game over / congrats) ---------- */
-  #overlay{
-    position:absolute; inset:6px; z-index:6; border-radius:10px;
-    background:rgba(14,9,32,.66); backdrop-filter:blur(3px);
-    display:flex; align-items:center; justify-content:center;
-  }
-  .panel{
-    background:#241b4d; border:4px solid #ffd93d; border-radius:14px;
-    padding:24px 30px; text-align:center; display:flex; flex-direction:column;
-    gap:14px; align-items:center; box-shadow:0 10px 0 rgba(0,0,0,.4);
-    max-width:92%;
-  }
-  .panel h2{ font-size:clamp(14px,2.4vw,22px); color:#ffd93d; text-shadow:0 3px 0 rgba(0,0,0,.4); line-height:1.5; }
-  .panel p{ font-size:10px; color:#cfd0ff; line-height:1.9; }
-  .panel p small{ font-size:8px; color:#8f86c9; }
-
-  /* ---------- STORE ---------- */
-  #storeOv{
-    position:absolute; inset:6px; z-index:8; border-radius:10px;
-    background:rgba(10,6,26,.82); backdrop-filter:blur(4px);
-    display:flex; align-items:center; justify-content:center; padding:12px;
-  }
-  .shop{
-    width:min(680px,96%); max-height:96%; overflow-y:auto;
-    background:#241b4d; border:4px solid #b388ff; border-radius:14px;
-    padding:16px 14px; display:flex; flex-direction:column; gap:12px; align-items:center;
-    box-shadow:0 10px 0 rgba(0,0,0,.4);
-  }
-  .shop h2{ font-size:clamp(13px,2.2vw,20px); color:#ffd93d; text-shadow:0 3px 0 rgba(0,0,0,.4); }
-  .shopBank{ font-size:9px; color:#ffe98a; background:#1a1338; border:3px solid #ffd93d; border-radius:10px; padding:8px 14px; line-height:1.7; }
-  #shopTabs{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-  .stab{
-    display:flex; align-items:center; gap:6px; font-family:inherit; font-size:9px; color:#fff;
-    background:#1a1338; border:3px solid #4a3590; border-radius:10px; padding:6px 10px; cursor:pointer;
-  }
-  .stab canvas{ image-rendering:pixelated; }
-  .stab.on{ border-color:#ffd93d; background:#332562; }
-  #shopGrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; width:100%; }
-  .skin{
-    background:#1a1338; border:3px solid #4a3590; border-radius:12px;
-    padding:10px 6px; display:flex; flex-direction:column; align-items:center; gap:6px;
-  }
-  .skin.eq{ border-color:#ffd93d; box-shadow:0 0 0 3px rgba(255,217,61,.25); }
-  .skin canvas{ image-rendering:pixelated; }
-  .sname{ font-size:9px; color:#fff; }
-  .sprice{ font-size:8px; color:#ffe98a; }
-  .skin button.sbuy{ font-size:8px; padding:8px 10px; border-radius:8px; box-shadow:0 3px 0 #b3541e; }
-  .skin button.sbuy:disabled{ opacity:.45; cursor:default; }
-  .skin.deny{ animation:denyShake .4s; }
-  @keyframes denyShake{
-    0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-6px); }
-    40%{ transform:translateX(6px); } 60%{ transform:translateX(-4px); } 80%{ transform:translateX(4px); }
-  }
-  @media (max-width:660px){ #shopGrid{ grid-template-columns:repeat(2,1fr); } }
-
-  .hidden{ display:none !important; }
-
-  /* ---------- Touch controls ---------- */
-  #touch{
-    display:none; width:min(1024px,96vw);
-    align-items:center; justify-content:space-between; padding:4px 6px;
-  }
-  @media (pointer:coarse){ #touch{ display:flex; } }
-  .dpad{ display:flex; gap:14px; }
-  .tbtn{
-    width:84px; height:84px; border-radius:50%;
-    background:rgba(255,255,255,.16); border:3px solid rgba(255,255,255,.45);
-    color:#fff; font-size:24px; user-select:none; -webkit-user-select:none;
-    touch-action:none; display:flex; align-items:center; justify-content:center;
-    font-family:inherit;
-  }
-  #tJump{ width:120px; height:84px; border-radius:24px; font-size:14px; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent; touch-action:manipulation; overscroll-behavior:none;
+}
+canvas,.tbtn{ -webkit-touch-callout:none; touch-action:none; }
+html,body{ min-height:100%; }
+body{
+  background:linear-gradient(160deg,#1b1240 0%,#31246b 45%,#173d6b 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-family:'Press Start 2P',monospace; color:#fff; padding:14px; gap:12px;
+}
+.topbar{ width:min(1024px,96vw); display:flex; align-items:center; justify-content:space-between; gap:10px 14px; flex-wrap:wrap; }
+.brand{ font-size:13px; color:#ffd93d; text-shadow:0 3px 0 rgba(0,0,0,.45); letter-spacing:1px; line-height:1.7; }
+.brand span{ display:block; font-size:8px; color:#b388ff; letter-spacing:2px; }
+.tools{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.bankchip{ font-size:10px; color:#ffd93d; background:#241b4d; border:3px solid #ffd93d; border-radius:10px; padding:9px 12px; box-shadow:0 4px 0 rgba(0,0,0,.35); }
+.bankchip b{ color:#ffe98a; }
+button.px{
+  font-family:inherit; font-size:11px; color:#1d1633; background:#ffd93d; border:0;
+  border-radius:10px; padding:12px 18px; cursor:pointer; box-shadow:0 5px 0 #b3541e; transition:transform .08s;
+}
+button.px:hover{ transform:translateY(-2px); }
+button.px:active{ transform:translateY(2px); box-shadow:0 2px 0 #b3541e; }
+button.px.small{ font-size:9px; padding:9px 12px; box-shadow:0 4px 0 #b3541e; border-radius:8px; }
+button.px.small:active{ box-shadow:0 1px 0 #b3541e; }
+button.px.alt{ background:#b388ff; box-shadow:0 5px 0 #5e3a99; }
+button.px.gold{ background:#ff9d3b; box-shadow:0 4px 0 #a85a10; }
+button.px.gold:active{ box-shadow:0 1px 0 #a85a10; }
+button.px:disabled{ opacity:.5; cursor:default; transform:none; }
+.btnrow{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+#wrap{ position:relative; width:min(1024px,96vw); }
+canvas#game{
+  display:block; width:100%; height:auto; background:#000; border:6px solid #14102b; border-radius:14px;
+  box-shadow:0 16px 40px rgba(0,0,0,.55); image-rendering:pixelated;
+}
+#credit{ font-size:8px; color:#8f86c9; letter-spacing:1px; text-align:center; line-height:1.8; }
+#menu{
+  position:absolute; inset:6px; z-index:5; border-radius:10px; background:rgba(22,14,46,.66); backdrop-filter:blur(4px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; padding:14px; overflow-y:auto;
+}
+#menu h1{ font-size:clamp(18px,3.4vw,32px); color:#ffd93d; text-shadow:0 4px 0 #b3541e,0 8px 0 rgba(0,0,0,.35); letter-spacing:2px; }
+#menu .sub{ font-size:clamp(8px,1.3vw,12px); color:#bde3ff; margin-top:6px; }
+#cards{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+.card{
+  --cc:#5ad946; background:#241b4d; border:4px solid var(--cc); border-radius:12px; padding:8px 8px 10px; cursor:pointer;
+  color:#fff; font-family:inherit; width:128px; display:flex; flex-direction:column; align-items:center; gap:6px;
+  box-shadow:0 6px 0 rgba(0,0,0,.35); transition:transform .12s, background .12s;
+}
+.card:hover{ transform:translateY(-6px) scale(1.05); background:#332566; }
+.card canvas{ image-rendering:pixelated; border-radius:8px; }
+.cname{ font-size:11px; } .cabil{ font-size:7px; color:var(--cc); line-height:1.6; min-height:22px; }
+.ckey{ font-size:7px; color:#8f86c9; }
+.hint{ font-size:8px; color:#cfd0ff; line-height:1.9; }
+#overlay{
+  position:absolute; inset:6px; z-index:6; border-radius:10px; background:rgba(14,9,32,.66); backdrop-filter:blur(3px);
+  display:flex; align-items:center; justify-content:center;
+}
+.panel{
+  background:#241b4d; border:4px solid #ffd93d; border-radius:14px; padding:24px 30px; text-align:center;
+  display:flex; flex-direction:column; gap:14px; align-items:center; box-shadow:0 10px 0 rgba(0,0,0,.4); max-width:92%;
+}
+.panel h2{ font-size:clamp(14px,2.4vw,22px); color:#ffd93d; text-shadow:0 3px 0 rgba(0,0,0,.4); line-height:1.5; }
+.panel p{ font-size:10px; color:#cfd0ff; line-height:1.9; }
+.panel p small{ font-size:8px; color:#8f86c9; }
+#storeOv{
+  position:absolute; inset:6px; z-index:8; border-radius:10px; background:rgba(10,6,26,.82); backdrop-filter:blur(4px);
+  display:flex; align-items:center; justify-content:center; padding:12px;
+}
+.shop{
+  width:min(680px,96%); max-height:96%; overflow-y:auto; background:#241b4d; border:4px solid #b388ff; border-radius:14px;
+  padding:16px 14px; display:flex; flex-direction:column; gap:12px; align-items:center; box-shadow:0 10px 0 rgba(0,0,0,.4);
+}
+.shop h2{ font-size:clamp(13px,2.2vw,20px); color:#ffd93d; text-shadow:0 3px 0 rgba(0,0,0,.4); }
+.shopBank{ font-size:9px; color:#ffe98a; background:#1a1338; border:3px solid #ffd93d; border-radius:10px; padding:8px 14px; line-height:1.7; }
+#shopTabs{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.stab{
+  display:flex; align-items:center; gap:6px; font-family:inherit; font-size:9px; color:#fff; background:#1a1338;
+  border:3px solid #4a3590; border-radius:10px; padding:6px 10px; cursor:pointer;
+}
+.stab canvas{ image-rendering:pixelated; }
+.stab.on{ border-color:#ffd93d; background:#332562; }
+#shopGrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; width:100%; }
+.skin{ background:#1a1338; border:3px solid #4a3590; border-radius:12px; padding:10px 6px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.skin.eq{ border-color:#ffd93d; box-shadow:0 0 0 3px rgba(255,217,61,.25); }
+.skin canvas{ image-rendering:pixelated; }
+.sname{ font-size:9px; color:#fff; }
+.sprice{ font-size:8px; color:#ffe98a; }
+.skin button.sbuy{ font-size:8px; padding:8px 10px; border-radius:8px; box-shadow:0 3px 0 #b3541e; }
+.skin button.sbuy:disabled{ opacity:.45; cursor:default; }
+.skin.deny{ animation:denyShake .4s; }
+@keyframes denyShake{
+  0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-6px); }
+  40%{ transform:translateX(6px); } 60%{ transform:translateX(-4px); } 80%{ transform:translateX(4px); }
+}
+@media (max-width:660px){ #shopGrid{ grid-template-columns:repeat(2,1fr); } }
+.hidden{ display:none !important; }
+#touch{ display:none; width:min(1024px,96vw); align-items:center; justify-content:space-between; padding:4px 6px; }
+@media (pointer:coarse){ #touch{ display:flex; } }
+.dpad{ display:flex; gap:14px; }
+.tbtn{
+  width:84px; height:84px; border-radius:50%; background:rgba(255,255,255,.16); border:3px solid rgba(255,255,255,.45);
+  color:#fff; font-size:24px; user-select:none; -webkit-user-select:none; display:flex; align-items:center; justify-content:center; font-family:inherit;
+}
+#tJump{ width:120px; height:84px; border-radius:24px; font-size:14px; }
 </style>
 </head>
 <body>
+
 <div id="credit">STOMP · COLLECT · POWER UP · BEAT THE MAGMA KING · 5 LEVELS AWAIT · PRESS R TO RESTART</div>
+
 <div class="topbar">
   <div class="brand">TINY HEROES<span>THE GREAT ESCAPE · FINAL</span></div>
   <div class="tools">
@@ -187,8 +163,9 @@
       <button class="px" id="shopClose" type="button">CLOSE ✕</button>
     </div>
   </div>
+</div>
 
-  <div id="touch">
+<div id="touch">
   <div class="dpad">
     <div class="tbtn" id="tLeft">◀</div>
     <div class="tbtn" id="tRight">▶</div>
@@ -198,16 +175,14 @@
 
 <script>
 'use strict';
-/* =====================================================================
-   TINY HEROES: THE GREAT ESCAPE — FINAL VERSION
-   merged engine + toolbar + shop + 5 levels + boss + power-ups
-   ===================================================================== */
+['contextmenu','selectstart','dragstart'].forEach(ev =>
+  document.addEventListener(ev, e => e.preventDefault())
+);
 const cv  = document.getElementById('game');
 const ctx = cv.getContext('2d');
 const W = 1024, H = 576, TS = 48, ROWS = 12;
 const GRAV = 2300, MAXFALL = 980;
 
-/* ---------------- SKINS (shop items: palettes per character) ---------------- */
 const SKINS = {
   slime: [
     { id:'classic', name:'Classic', price:0,   pal:{ g:'#5ad946', d:'#2f9e3a', W:'#ffffff', B:'#173d17', b:'#2f9e3a' } },
@@ -240,7 +215,6 @@ function charPal(key){
   return SKINS[key].find(s=>s.id===id) || SKINS[key][0];
 }
 
-/* ---------------- PERSISTENT SAVE (bank / skins / sound / best) ---------------- */
 const SAVE_KEY = 'tinyheroes-final-v1';
 const SAVE = { bank:0, best:0, sound:true,
   owned:{ slime:['classic'], cat:['classic'], robot:['classic'], ghost:['classic'] },
@@ -262,7 +236,6 @@ function loadSave(){
 }
 function saveSave(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(SAVE)); }catch(e){} }
 
-/* ---------------- AUDIO (Web Audio bleeps) ---------------- */
 let AC = null, muted = false;
 function initAudio(){
   if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
@@ -303,7 +276,7 @@ const SFX = {
   over(){  [392,311,262,196].forEach((f,i)=>tone(f,0.2,'square',0.11,null,i*0.13)); },
   win(){   [523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,0.16,'square',0.11,null,i*0.1)); }
 };
-/* ---------------- PIXEL SPRITES (12x12 grids) ---------------- */
+
 const PAL = {
   walker:{ m:'#ff6b6b', W:'#ffffff', B:'#3d1010', b:'#5b1e1e' },
   armored:{ m:'#ff6b6b', W:'#ffffff', B:'#3d1010', b:'#5b1e1e', h:'#aeb9c9' },
@@ -361,14 +334,11 @@ const SPR = {
     'mmWWmmmmmmWWmm','mmWBmmmmmmWBmm','mmmmmmmmmmmmmm','mmmmddddddmmmm',
     'mmmmdffffdmmmm','.mmmmmmmmmmmm.','.mmmmmmmmmmmm.','..mmmmmmmmmm..',
     '..mmm....mmm..','..ddd....ddd..'],
-  heart:[
-    '.RR.RR.','RRRRRRR','RRRRRRR','.RRRRR.','..RRR..','...R...'],
+  heart:['.RR.RR.','RRRRRRR','RRRRRRR','.RRRRR.','..RRR..','...R...'],
   star:[
     '....y....','....y....','...yyy...','yyyyyyyyy','.yyyyyyy.',
     '..yyyyy..','..yyyyy..','.yyy.yyy.','.y.....y.'],
-  magnet:[
-    '.WW...WW.','.mm...mm.','.mm...mm.','.mm...mm.','.mm...mm.',
-    '.mmmmmmm.','..mmmmm..']
+  magnet:['.WW...WW.','.mm...mm.','.mm...mm.','.mm...mm.','.mm...mm.','.mmmmmmm.','..mmmmm..']
 };
 function drawSprite(g, rows, pal, x, y, s, flip){
   for(let r=0; r<rows.length; r++){
@@ -383,7 +353,6 @@ function drawSprite(g, rows, pal, x, y, s, flip){
   }
 }
 
-/* ---------------- CHARACTERS ---------------- */
 const CHARS = {
   slime:{ label:'SLIME', emoji:'🟢', ability:'Double Jump!<br>press JUMP in mid-air',
           color:'#5ad946', speed:265, jump:760, djump:660, sprite:SPR.slime },
@@ -395,7 +364,6 @@ const CHARS = {
           color:'#b9c4ff', speed:280, jump:730, float:true, sprite:SPR.ghost }
 };
 
-/* ---------------- THEMES ---------------- */
 const THEMES = [
   { name:'Sunny Meadows', sky:['#7ec8ff','#d8f3ff'], ground:'#8a5a2b', top:'#58c14e',
     dark:'#6b431f', plat:'#c98a3e', platTop:'#e8b06a', hill1:'#8fd460', hill2:'#6db84a', cloud:'#ffffff' },
@@ -409,11 +377,6 @@ const THEMES = [
     dark:'#181030', plat:'#3a2a5e', platTop:'#7c5cd6', hill1:'#120a24', hill2:'#1a1034', cloud:'#8a6cff' }
 ];
 
-/* ---------------- LEVELS ----------------
-   legend:  # ground  - platform  ^ spikes  o coin
-            E walker  A armored(2 stomps)  K spiky(unstompable)  J hopper
-            B flyer   h heart  i star  d shield  m magnet
-            S start   P portal                       */
 const LEVELS = [
   { name:'Sunny Meadows', theme:0, map:[
   '..................................',
@@ -486,18 +449,18 @@ const LEVELS = [
   '#########......##########....##########......############......############....#################',
   ]}
 ];
-/* ---------------- GAME STATE ---------------- */
+
 const G = { state:'menu', level:0, charKey:'slime', score:0, levelStartScore:0,
-            hearts:3, coinsGot:0, coinsTotal:0, time:0, cam:0, shake:0, msgT:0, flash:0, banner:null };
+            hearts:3, coinsGot:0, coinsTotal:0, time:0, runT:0, cam:0, shake:0, msgT:0, flash:0, banner:null };
 let grid=[], COLS=0, coins=[], enemies=[], particles=[], popups=[], powerups=[], shockwaves=[];
 let portal=null, spawn={x:100,y:100}, boss=null;
 let starT=0, magnetT=0, shield=false;
 const p = { x:0,y:0,w:40,h:46,vx:0,vy:0,grounded:false,facing:1,coyote:0,
             airJumps:0,floatE:1.2,inv:0,squash:0,stretch:0,floating:false };
 
-/* ---------------- HELPERS ---------------- */
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const overlap=(ax,ay,aw,ah,bx,by,bw,bh)=>ax<bx+bw&&ax+aw>bx&&ay<by+bh&&ay+ah>by;
+const fmtT=s=>{ s=Math.floor(s); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
 function tileAt(c,r){
   if(c<0||c>=COLS) return '#';
   if(r<0||r>=ROWS) return '.';
@@ -505,7 +468,6 @@ function tileAt(c,r){
 }
 const isSolid = ch => ch==='#'||ch==='-';
 
-/* ---------------- LEVEL LOADING ---------------- */
 function loadLevel(idx){
   const L = LEVELS[idx];
   G.levelStartScore = G.score;
@@ -543,7 +505,6 @@ function respawn(){
   p.x=spawn.x; p.y=spawn.y; p.vx=0; p.vy=0; p.inv=1.4; p.grounded=false; p.floating=false;
 }
 
-/* ---------------- INPUT ---------------- */
 const keys={ l:false, r:false, j:false };
 let jumpBuf=0;
 const storeEl = document.getElementById('storeOv');
@@ -580,7 +541,6 @@ bindTouch('tLeft', ()=>keys.l=true, ()=>keys.l=false);
 bindTouch('tRight',()=>keys.r=true, ()=>keys.r=false);
 bindTouch('tJump', ()=>{ jumpBuf=0.12; keys.j=true; }, ()=>keys.j=false);
 
-/* ---------------- UI ---------------- */
 const menuEl=document.getElementById('menu'), ovEl=document.getElementById('overlay'),
       ovTitle=document.getElementById('ovTitle'), ovText=document.getElementById('ovText'),
       ovBtn=document.getElementById('ovBtn'), ovBtn2=document.getElementById('ovBtn2'),
@@ -612,7 +572,6 @@ soundBtn.onclick = ()=>{
 storeBtn.onclick = ()=>{ initAudio(); storeOpen()? closeStore() : openStore(); };
 document.getElementById('shopClose').onclick = ()=>closeStore();
 
-/* character cards (preview uses equipped skin) */
 const cardsEl=document.getElementById('cards');
 const cardCtx={};
 ORDER.forEach((key,i)=>{
@@ -636,7 +595,7 @@ function redrawCard(key){
 ORDER.forEach(redrawCard);
 function pick(key){ SFX.select(); startGame(key); }
 function startGame(key){
-  G.charKey=key; G.score=0; G.hearts=3; G.level=0;
+  G.charKey=key; G.score=0; G.hearts=3; G.level=0; G.runT=0;
   menuEl.classList.add('hidden');
   storeEl.classList.add('hidden');
   ovEl.classList.add('hidden');
@@ -653,7 +612,6 @@ function backToMenu(){
   menuEl.classList.remove('hidden'); updateUI();
 }
 
-/* ---------------- STORE ---------------- */
 let shopChar='slime', storePrev='menu', overlayWasOpen=false;
 function openStore(){
   if(storeOpen()) return;
@@ -715,7 +673,6 @@ function renderShop(){
   });
 }
 
-/* ---------------- FLOW ---------------- */
 function levelClear(){
   G.state='clear'; SFX.clear(); updateUI();
   G.score += 100; saveBest();
@@ -729,7 +686,7 @@ function winGame(){
   G.state='win'; SFX.win(); saveBest();
   confetti(110);
   showOverlay('🏆 CONGRATULATIONS! 🏆',
-    `You conquered all 5 levels and escaped!<br>FINAL SCORE ${G.score} · BEST ${SAVE.best}<br>` +
+    `You conquered all 5 levels and escaped!<br>FINAL SCORE ${G.score} · BEST ${SAVE.best}<br>TIME ${fmtT(G.runT)}<br>` +
     `COIN BANK ${SAVE.bank} 🪙 — spend it in the SHOP!`,
     'PLAY AGAIN ▶', ()=>{ startGame(G.charKey); },
     '🛒 SPEND COINS', ()=>{ openStore(); });
@@ -740,7 +697,7 @@ function gameOver(){
     `Score ${G.score} · Best ${SAVE.best}<br>the portal still waits for you!`,
     'TRY AGAIN ↻', restartLevel);
 }
-/* ---------------- PARTICLES & POPUPS ---------------- */
+
 function burst(x,y,n,color,speed,grav){
   for(let i=0;i<n;i++){
     const a=Math.random()*Math.PI*2, s=Math.random()*speed;
@@ -757,7 +714,6 @@ function confetti(n){
 }
 function popup(x,y,txt,color){ popups.push({x,y,txt,color,life:0.9}); }
 
-/* ---------------- PHYSICS ---------------- */
 function doJump(v){
   p.vy=-v; p.grounded=false; p.coyote=0; p.stretch=1;
   SFX.jump(); burst(p.x+p.w/2, p.y+p.h, 4, '#ffffff', 90, 500);
@@ -814,7 +770,6 @@ function updatePlayer(dt){
   p.squash=Math.max(0,p.squash-6*dt);
   p.stretch=Math.max(0,p.stretch-6*dt);
   p.inv=Math.max(0,p.inv-dt);
-  /* invincibility-star sparkles */
   if(starT>0 && Math.random()<0.35)
     particles.push({x:p.x+Math.random()*p.w, y:p.y+Math.random()*p.h,
       vx:(Math.random()-0.5)*60, vy:-30, life:0.35, max:0.35, size:3,
@@ -834,7 +789,6 @@ function hurtPlayer(fromX){
   if(G.hearts<=0) gameOver();
 }
 
-/* ---------------- BOSS: THE MAGMA KING ---------------- */
 function spawnBoss(){
   boss={ x:LEVELS[G.level].bossCol*TS, y:10*TS-114, w:112, h:114,
          hp:8, max:8, dir:-1, spd:62, vy:0, vx:0, grounded:true,
@@ -919,7 +873,6 @@ function bossDie(){
   SFX.clear();
 }
 
-/* ---------------- POWER-UPS ---------------- */
 const PUCOL={ h:'#ff6b81', i:'#ffd93d', d:'#54e8ff', m:'#b388ff' };
 function collectPowerup(pu){
   pu.got=true; SFX.power();
@@ -939,9 +892,8 @@ function killEnemy(e){
   SFX.stomp();
 }
 
-/* ---------------- UPDATE ---------------- */
 function updatePlay(dt){
-  G.time+=dt; G.msgT-=dt; G.shake=Math.max(0,G.shake-dt*1.6);
+  G.runT=(G.runT||0)+dt; G.time+=dt; G.msgT-=dt; G.shake=Math.max(0,G.shake-dt*1.6);
   G.flash=Math.max(0,G.flash-dt);
   starT=Math.max(0,starT-dt); magnetT=Math.max(0,magnetT-dt);
   if(G.banner){ G.banner.t-=dt; if(G.banner.t<=0) G.banner=null; }
@@ -957,17 +909,14 @@ function updatePlay(dt){
     if(Math.random()<0.006) G.flash=0.14;
   }
   updatePlayer(dt);
-  /* boss trigger */
   if(L.boss && !boss && p.x+p.w > L.triggerCol*TS){ closeGate(); spawnBoss(); }
   if(boss) updateBoss(dt);
-  /* power-ups */
   for(const pu of powerups){
     if(pu.got) continue;
     pu.t+=dt;
     if(overlap(p.x,p.y,p.w,p.h,pu.x-16,pu.y-16,32,32)) collectPowerup(pu);
   }
   powerups=powerups.filter(u=>!u.got);
-  /* coin magnet */
   if(magnetT>0){
     for(const c of coins){
       if(c.got) continue;
@@ -975,7 +924,6 @@ function updatePlay(dt){
       if(d<190){ c.x+=dx/d*430*dt; c.y+=dy/d*430*dt; }
     }
   }
-  /* enemies */
   for(const e of enemies){
     if(e.dead) continue;
     e.t+=dt;
@@ -1015,7 +963,6 @@ function updatePlay(dt){
       } else hurtPlayer(e.x+e.w/2);
     }
   }
-  /* boss shockwaves */
   for(const s of shockwaves){
     if(s.dead) continue;
     s.life-=dt; s.x+=s.dir*s.spd*dt;
@@ -1029,7 +976,6 @@ function updatePlay(dt){
     if(overlap(p.x,p.y,p.w,p.h,s.x,s.y,s.w,s.h)) hurtPlayer(s.x+s.w/2);
   }
   shockwaves=shockwaves.filter(s=>!s.dead);
-  /* boss vs player */
   if(boss && !boss.dead && overlap(p.x,p.y,p.w,p.h,boss.x,boss.y,boss.w,boss.h)){
     const stomp=p.vy>40 && (p.y+p.h-boss.y)<boss.h*0.5;
     if(stomp){
@@ -1043,7 +989,6 @@ function updatePlay(dt){
       else if(boss.hp===boss.max/2){ SFX.roar(); popup(boss.x+boss.w/2, boss.y-30, 'ENRAGED!', '#ff6b6b'); }
     } else if(starT<=0) hurtPlayer(boss.x+boss.w/2);
   }
-  /* spikes (invincibility star protects) */
   if(starT<=0){
     const ix=p.x+6, iy=p.y+4, iw=p.w-12, ih=p.h-6;
     for(let r=Math.floor(iy/TS); r<=Math.floor((iy+ih)/TS); r++)
@@ -1051,25 +996,21 @@ function updatePlay(dt){
         if(tileAt(c,r)==='^' && overlap(ix,iy,iw,ih,c*TS+6,r*TS+22,TS-12,TS-22))
           hurtPlayer(p.x+p.w/2+(p.vx>=0?60:-60));
   }
-  /* coins */
   for(const c of coins)
     if(!c.got && overlap(p.x,p.y,p.w,p.h,c.x-12,c.y-12,24,24)){
       c.got=true; G.coinsGot++; G.score+=10; SAVE.bank++;
       updBank(); saveSave(); SFX.coin();
       popup(c.x,c.y-14,'+10','#ffd93d'); burst(c.x,c.y,7,'#ffe98a',140,300);
     }
-  /* fell into a pit */
   if(p.y>ROWS*TS+60){
     G.hearts--; SFX.hurt(); G.shake=0.35;
     if(G.hearts<=0){ gameOver(); } else respawn();
   }
-  /* portal */
   if(portal && overlap(p.x,p.y,p.w,p.h,portal.x+4,portal.baseY-64,TS-8,64)) levelClear();
   if(portal && Math.random()<0.5)
     particles.push({x:portal.x+8+Math.random()*(TS-16), y:portal.baseY-10-Math.random()*50,
       vx:(Math.random()-0.5)*30, vy:-50-Math.random()*40, life:0.7, max:0.7,
       size:3, color:'#c9a0ff', grav:0});
-  /* camera */
   const target=clamp(p.x+p.w/2-W/2, 0, COLS*TS-W);
   G.cam+=(target-G.cam)*Math.min(1,10*dt);
 }
@@ -1080,12 +1021,12 @@ function updateFx(dt){
   popups=popups.filter(q=>q.life>0);
   G.shake=Math.max(0,G.shake-dt*1.6);
 }
-/* ---------------- DRAWING ---------------- */
+
 function drawBG(th, camX){
   const g=ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,th.sky[0]); g.addColorStop(1,th.sky[1]);
   ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-  if(LEVELS[G.level].theme===1){                        // cave: twinkling stars
+  if(LEVELS[G.level].theme===1){
     ctx.fillStyle='#fff';
     for(let i=0;i<42;i++){
       const x=(((i*97+13-camX*0.2)%W)+W)%W, y=(i*61)%320;
@@ -1093,7 +1034,7 @@ function drawBG(th, camX){
       ctx.fillRect(x,y,3,3);
     }
     ctx.globalAlpha=1;
-  } else {                                              // clouds
+  } else {
     ctx.fillStyle=th.cloud; ctx.globalAlpha=0.85;
     for(let i=0;i<6;i++){
       const span=W+420;
@@ -1298,7 +1239,6 @@ function drawHeart(x,y,full){
 }
 function drawHUD(){
   for(let i=0;i<4;i++) drawHeart(18+i*30,14,i<G.hearts);
-  /* power-up timers */
   let py=50;
   const pbar=(color,frac)=>{
     ctx.fillStyle='rgba(0,0,0,.45)'; ctx.fillRect(16,py,64,10);
@@ -1317,7 +1257,6 @@ function drawHUD(){
   ctx.textAlign='center'; ctx.lineWidth=5; ctx.strokeStyle='#1d1633';
   const s='SCORE '+String(G.score).padStart(5,'0');
   ctx.strokeText(s,W/2,30); ctx.fillStyle='#fff'; ctx.fillText(s,W/2,30);
-  /* coin icon */
   ctx.fillStyle='#c77d00'; ctx.beginPath(); ctx.arc(W-152,22,9,0,7); ctx.fill();
   ctx.fillStyle='#ffb300'; ctx.beginPath(); ctx.arc(W-152,22,7,0,7); ctx.fill();
   ctx.fillStyle='#ffe14d'; ctx.beginPath(); ctx.arc(W-154,20,3,0,7); ctx.fill();
@@ -1327,7 +1266,9 @@ function drawHUD(){
   ctx.textAlign='right';
   const lv='LV '+(G.level+1)+'/'+LEVELS.length;
   ctx.strokeText(lv,W-16,30); ctx.fillStyle='#ffd93d'; ctx.fillText(lv,W-16,30);
-  /* boss health bar */
+  ctx.font='10px "Press Start 2P",monospace';
+  const tm='TIME '+fmtT(G.runT||0);
+  ctx.strokeText(tm,W-16,52); ctx.fillStyle='#fff'; ctx.fillText(tm,W-16,52);
   if(boss && !boss.dead && G.state==='play'){
     const bw=340, bx=(W-bw)/2, by=50;
     ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(bx-3,by-3,bw+6,20);
@@ -1341,10 +1282,10 @@ function drawHUD(){
     ctx.strokeText('MAGMA KING',W/2,by-8);
     ctx.fillStyle='#ffd93d'; ctx.fillText('MAGMA KING',W/2,by-8);
   }
-  /* level banner */
   if(G.msgT>0){
     ctx.globalAlpha=Math.min(1,G.msgT);
     ctx.textAlign='center'; ctx.font='20px "Press Start 2P",monospace';
+    ctx.lineWidth=5; ctx.strokeStyle='#1d1633';
     const th=THEMES[LEVELS[G.level].theme];
     ctx.strokeText('LEVEL '+(G.level+1),W/2,H*0.3);
     ctx.fillStyle='#fff'; ctx.fillText('LEVEL '+(G.level+1),W/2,H*0.3);
@@ -1353,7 +1294,6 @@ function drawHUD(){
     ctx.fillStyle='#ffd93d'; ctx.fillText(th.name,W/2,H*0.3+30);
     ctx.globalAlpha=1;
   }
-  /* event banner (boss / portal) */
   if(G.banner){
     ctx.globalAlpha=Math.min(1,G.banner.t);
     ctx.textAlign='center'; ctx.font='16px "Press Start 2P",monospace';
@@ -1363,11 +1303,9 @@ function drawHUD(){
     ctx.globalAlpha=1;
   }
 }
-/* animated backdrop behind the character-select menu */
 function drawMenuScene(){
   const th=THEMES[0], cam=G.time*30;
   drawBG(th,cam);
-  ctx.fillStyle=th.ground;
   const off=cam%TS;
   for(let c=-1;c<W/TS+1;c++){
     const x=c*TS-off;
@@ -1391,7 +1329,6 @@ function drawMenuScene(){
   }
 }
 
-/* ---------------- INIT & MAIN LOOP ---------------- */
 loadSave();
 muted=!SAVE.sound;
 soundBtn.textContent = muted? 'SOUND OFF' : 'SOUND ON';
@@ -1401,13 +1338,11 @@ let last=performance.now();
 function loop(now){
   const dt=Math.min(0.033,(now-last)/1000); last=now;
   G.time += (G.state==='menu')?dt:0;
-
   if(G.state==='play') updatePlay(dt);
   else if(G.state!=='menu'){
     updateFx(dt);
     if(G.state==='win' && Math.random()<0.12) confetti(18);
   }
-
   ctx.clearRect(0,0,W,H);
   if(G.state==='menu'){
     drawMenuScene();
@@ -1433,8 +1368,8 @@ function loop(now){
 }
 requestAnimationFrame(loop);
 if(document.fonts && document.fonts.load){ try{ document.fonts.load('12px "Press Start 2P"'); }catch(e){} }
-/* TINY HEROES — NEW SHOP HEROES ADD-ON (11 characters)
-   Load AFTER the main game script (see instructions). Uses the game's own SAVE / SKINS / CHARS / SPR. */
+</script>
+<script>
 (function(){
 let buildCards;
 const NEW=['dragon','unicorn','ninja','knight','fox','panda','alien','pirate','phoenix','shark','wizard'];
@@ -1476,7 +1411,6 @@ wizard:{label:'WIZARD',emoji:'🧙',price:400,color:'#8a5cf0',ability:'Coin Magi
 for(const k of NEW){ const d=DEF[k]; SPR[k]=d.rows; SKINS[k]=[{id:'classic',name:'Classic',price:0,pal:d.pal}];
   CHARS[k]=Object.assign({},d,{sprite:d.rows}); }
 
-/* saved heroes (main script's loadSave doesn't know about them) */
 SAVE.heroes=[]; SAVE.hero=null;
 try{ const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
   if(s){ if(Array.isArray(s.heroes)) SAVE.heroes=s.heroes.filter(k=>NEW.includes(k));
@@ -1484,7 +1418,6 @@ try{ const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
 
 const ownedList=()=>ORDER.concat(NEW.filter(k=>SAVE.heroes.includes(k)));
 
-/* menu cards: originals + any hero you bought */
 function drawCard(key){ const g=cardCtx[key]; if(!g) return; g.clearRect(0,0,112,112);
   g.globalAlpha=key==='ghost'?0.9:1; drawSprite(g,CHARS[key].sprite,charPal(key).pal,8,8,8); g.globalAlpha=1; }
 buildCards=function(){
@@ -1500,14 +1433,12 @@ buildCards=function(){
 redrawCard=function(key){ drawCard(key); };
 pick=function(key){ SAVE.hero=key; saveSave(); SFX.select(); startGame(key); };
 
-/* abilities that the main engine doesn't have built in */
 const _ll=loadLevel;
 loadLevel=function(i){ _ll(i); const c=CHARS[G.charKey]; if(c.startShield) shield=true; if(c.startMagnet) magnetT=c.startMagnet; };
 const _up=updatePlay;
 updatePlay=function(dt){ const b0=SAVE.bank; _up(dt); const gain=SAVE.bank-b0, bn=CHARS[G.charKey].bonus||0;
   if(gain>0 && bn){ SAVE.bank+=gain*bn; updBank(); saveSave(); } };
 
-/* shop: extra "NEW HEROES" tab */
 function renderHeroes(){
   const gridEl=document.getElementById('shopGrid'); gridEl.innerHTML='';
   NEW.forEach(key=>{
