@@ -1257,18 +1257,18 @@ function drawHUD(){
   ctx.textAlign='center'; ctx.lineWidth=5; ctx.strokeStyle='#1d1633';
   const s='SCORE '+String(G.score).padStart(5,'0');
   ctx.strokeText(s,W/2,30); ctx.fillStyle='#fff'; ctx.fillText(s,W/2,30);
-  ctx.fillStyle='#c77d00'; ctx.beginPath(); ctx.arc(W-152,22,9,0,7); ctx.fill();
-  ctx.fillStyle='#ffb300'; ctx.beginPath(); ctx.arc(W-152,22,7,0,7); ctx.fill();
-  ctx.fillStyle='#ffe14d'; ctx.beginPath(); ctx.arc(W-154,20,3,0,7); ctx.fill();
-  ctx.textAlign='left';
-  const t=G.coinsGot+'/'+G.coinsTotal;
-  ctx.strokeText(t,W-136,30); ctx.fillText(t,W-136,30);
-  ctx.textAlign='right';
+    ctx.textAlign='right';
   const lv='LV '+(G.level+1)+'/'+LEVELS.length;
   ctx.strokeText(lv,W-16,30); ctx.fillStyle='#ffd93d'; ctx.fillText(lv,W-16,30);
+  const t=G.coinsGot+'/'+G.coinsTotal, tw=ctx.measureText(t).width;
+  ctx.strokeText(t,W-16,58); ctx.fillStyle='#fff'; ctx.fillText(t,W-16,58);
+  const cix=W-16-tw-16;
+  ctx.fillStyle='#c77d00'; ctx.beginPath(); ctx.arc(cix,53,9,0,7); ctx.fill();
+  ctx.fillStyle='#ffb300'; ctx.beginPath(); ctx.arc(cix,53,7,0,7); ctx.fill();
+  ctx.fillStyle='#ffe14d'; ctx.beginPath(); ctx.arc(cix-2,51,3,0,7); ctx.fill();
   ctx.font='10px "Press Start 2P",monospace';
   const tm='TIME '+fmtT(G.runT||0);
-  ctx.strokeText(tm,W-16,52); ctx.fillStyle='#fff'; ctx.fillText(tm,W-16,52);
+  ctx.strokeText(tm,W-16,80); ctx.fillStyle='#fff'; ctx.fillText(tm,W-16,80);
   if(boss && !boss.dead && G.state==='play'){
     const bw=340, bx=(W-bw)/2, by=50;
     ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(bx-3,by-3,bw+6,20);
